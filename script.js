@@ -3,7 +3,8 @@ let turn = false; // false is black, true is white
 let gameState = {}; // stores value of each board space
 let checked = [];
 
-let ticker = 0;
+let blackCaptured = 0;
+let whiteCaptured = 0;
 
 function addStoneToGamestate(row, column) {
     gameState[row][column] = turn;
@@ -15,41 +16,48 @@ function checkOpponent(row, column) {
     let below = { row: row + 1, column: column };
     let left = { row: row, column: column - 1 };
 
-    if (gameState[(row - 1)][column] == !turn && !checked.includes(above)) {
-        console.log(checkForLife(row - 1, column));
+    if ((row - 1) > 0 && gameState[(row - 1)][column] == !turn && !checked.includes(above)) {
+        if (checkForLife(row - 1, column) == false) {
+            removeStones();
+        }
     }
-    if (gameState[row][(column + 1)] == !turn && !checked.includes(right)) {
-        console.log(checkForLife(row, column + 1));
+    if ((column + 1) < 20 && gameState[row][(column + 1)] == !turn && !checked.includes(right)) {
+        if (checkForLife(row, column + 1) === false) {
+            removeStones();
+        }
     }
-    if (gameState[(row + 1)][column] == !turn && !checked.includes(below)) {
-        console.log(checkForLife(row + 1, column));
+    if ((row + 1) < 20 && gameState[(row + 1)][column] == !turn && !checked.includes(below)) {
+        if (checkForLife(row + 1, column) === false) {
+            removeStones();
+        }
     }
-    if (gameState[row][(column - 1)] == !turn && !checked.includes(left)) {
-        console.log(checkForLife(row, column - 1));
+    if ((column - 1) > 0 && gameState[row][(column - 1)] == !turn && !checked.includes(left)) {
+        if (checkForLife(row, column - 1) === false) {
+            removeStones();
+        }
     }
-    console.log(checked);
     checked = [];
 }
 
 function checkForLife(row, column) {
     let stone = gameState[row][column];
     let stoneCoordinate = { row: row, column: column };
-    let above = `${row - 1}${column}`;
-    let right = `${row}${column + 1}`;
-    let below = `${row + 1}${column}`;
-    let left = `${row}${column - 1}`;
+    let above = `${row - 1}-${column}`;
+    let right = `${row}-${column + 1}`;
+    let below = `${row + 1}-${column}`;
+    let left = `${row}-${column - 1}`;
 
-    checked.push(`${row}${column}`);
+    checked.push(`${row}-${column}`);
 
     if (checkForLiberties(row, column)) {
         return true;
-    } else if (gameState[(row - 1)][column] == stone && !checked.includes(above) && checkForLife(row - 1, column)) {
+    } else if ((row - 1) > 0 && gameState[(row - 1)][column] == stone && !checked.includes(above) && checkForLife(row - 1, column)) {
         return true;
-    } else if (gameState[row][(column + 1)] == stone && !checked.includes(right) && checkForLife(row, column + 1)) {
+    } else if ((column + 1) < 20 && gameState[row][(column + 1)] == stone && !checked.includes(right) && checkForLife(row, column + 1)) {
         return true;
-    } else if (gameState[(row + 1)][column] == stone && !checked.includes(below) && checkForLife(row + 1, column)) {
+    } else if ((row + 1) < 20 && gameState[(row + 1)][column] == stone && !checked.includes(below) && checkForLife(row + 1, column)) {
         return true;
-    } else if (gameState[row][(column - 1)] == stone && !checked.includes(left) && checkForLife(row, column - 1)) {
+    } else if ((column - 1) > 0 && gameState[row][(column - 1)] == stone && !checked.includes(left) && checkForLife(row, column - 1)) {
         return true;
     } else {
         return false;
@@ -58,14 +66,29 @@ function checkForLife(row, column) {
 
 function checkForLiberties(row, column) {
     if (
-        gameState[(row - 1)][column] == 2 ||
-        gameState[row][(column + 1)] == 2 ||
-        gameState[(row + 1)][column] == 2 ||
-        gameState[row][(column - 1)] == 2) {
+        (row - 1) > 0 && gameState[(row - 1)][column] == 2 ||
+        (column + 1) < 20 && gameState[row][(column + 1)] == 2 ||
+        (row + 1) < 20 && gameState[(row + 1)][column] == 2 ||
+        (column - 1) > 0 && gameState[row][(column - 1)] == 2) {
         return true;
     }
 }
 
+function removeStones() {
+    if (turn == false) {
+        whiteCaptured += checked.length;
+    } else {
+        blackCaptured += checked.length;
+    }
+
+    checked.forEach(coordinate => {
+        let square = document.getElementById(coordinate);
+        square.style.removeProperty("background-image");
+        let coordinates = coordinate.split("-");
+        gameState[coordinates[0]][(coordinates[1])] = 2;
+    });
+    checked = [];
+}
 
 function playStone(square) {
     let coordinates = square.id.split("-");
@@ -125,9 +148,5 @@ function newBoard() {
     board.replaceChildren();
     firstBoard(squares);
 }
-/*
-document.querySelectorAll(".square").forEach(square => square.addEventListener("click", () => console.log("hi")));
- 
-playStone(square)));
-*/
+
 firstBoard(19);
