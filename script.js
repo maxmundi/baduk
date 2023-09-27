@@ -1,47 +1,38 @@
 
+let boardSize = 0;
 let turn = false; // false is black, true is white
 let gameState = {}; // stores value of each board space
 let checked = [];
+let koRecord = "";
 
 let blackCaptured = 0;
 let whiteCaptured = 0;
 
-function addStoneToGamestate(row, column) {
-    gameState[row][column] = turn;
-}
-
 function checkOpponent(row, column) {
-    let above = { row: row - 1, column: column };
-    let right = { row: row, column: column + 1 };
-    let below = { row: row + 1, column: column };
-    let left = { row: row, column: column - 1 };
-
-    if ((row - 1) > 0 && gameState[(row - 1)][column] == !turn && !checked.includes(above)) {
+    if ((row - 1) > 0 && gameState[(row - 1)][column] == !turn) {
         if (checkForLife(row - 1, column) == false) {
             removeStones();
         }
     }
-    if ((column + 1) < 20 && gameState[row][(column + 1)] == !turn && !checked.includes(right)) {
-        if (checkForLife(row, column + 1) === false) {
+    if ((column + 1) < (boardSize + 1) && gameState[row][(column + 1)] == !turn) {
+        if (checkForLife(row, column + 1) == false) {
             removeStones();
         }
     }
-    if ((row + 1) < 20 && gameState[(row + 1)][column] == !turn && !checked.includes(below)) {
-        if (checkForLife(row + 1, column) === false) {
+    if ((row + 1) < (boardSize + 1) && gameState[(row + 1)][column] == !turn) {
+        if (checkForLife(row + 1, column) == false) {
             removeStones();
         }
     }
-    if ((column - 1) > 0 && gameState[row][(column - 1)] == !turn && !checked.includes(left)) {
-        if (checkForLife(row, column - 1) === false) {
+    if ((column - 1) > 0 && gameState[row][(column - 1)] == !turn) {
+        if (checkForLife(row, column - 1) == false) {
             removeStones();
         }
     }
-    checked = [];
 }
 
 function checkForLife(row, column) {
     let stone = gameState[row][column];
-    let stoneCoordinate = { row: row, column: column };
     let above = `${row - 1}-${column}`;
     let right = `${row}-${column + 1}`;
     let below = `${row + 1}-${column}`;
@@ -50,12 +41,13 @@ function checkForLife(row, column) {
     checked.push(`${row}-${column}`);
 
     if (checkForLiberties(row, column)) {
+        checked = [];
         return true;
     } else if ((row - 1) > 0 && gameState[(row - 1)][column] == stone && !checked.includes(above) && checkForLife(row - 1, column)) {
         return true;
-    } else if ((column + 1) < 20 && gameState[row][(column + 1)] == stone && !checked.includes(right) && checkForLife(row, column + 1)) {
+    } else if ((column + 1) < (boardSize + 1) && gameState[row][(column + 1)] == stone && !checked.includes(right) && checkForLife(row, column + 1)) {
         return true;
-    } else if ((row + 1) < 20 && gameState[(row + 1)][column] == stone && !checked.includes(below) && checkForLife(row + 1, column)) {
+    } else if ((row + 1) < (boardSize + 1) && gameState[(row + 1)][column] == stone && !checked.includes(below) && checkForLife(row + 1, column)) {
         return true;
     } else if ((column - 1) > 0 && gameState[row][(column - 1)] == stone && !checked.includes(left) && checkForLife(row, column - 1)) {
         return true;
@@ -67,8 +59,8 @@ function checkForLife(row, column) {
 function checkForLiberties(row, column) {
     if (
         (row - 1) > 0 && gameState[(row - 1)][column] == 2 ||
-        (column + 1) < 20 && gameState[row][(column + 1)] == 2 ||
-        (row + 1) < 20 && gameState[(row + 1)][column] == 2 ||
+        (column + 1) < (boardSize + 1) && gameState[row][(column + 1)] == 2 ||
+        (row + 1) < (boardSize + 1) && gameState[(row + 1)][column] == 2 ||
         (column - 1) > 0 && gameState[row][(column - 1)] == 2) {
         return true;
     }
@@ -79,6 +71,10 @@ function removeStones() {
         whiteCaptured += checked.length;
     } else {
         blackCaptured += checked.length;
+    }
+
+    if (checked.length == 1) {
+        koRecord = checked[0];
     }
 
     checked.forEach(coordinate => {
@@ -99,12 +95,23 @@ function playStone(square) {
         return;
     }
 
-    addStoneToGamestate(row, column);
+    if (`${row}-${column}` == koRecord) { // checks for ko
+        alert("Illegal move.");
+        return;
+    }
+    koRecord = "";
 
-    checkOpponent(row, column);
+    gameState[row][column] = turn; // updates the gameState
 
+    checkOpponent(row, column); // checks for captures
 
-    if (turn == false) {
+    if (checkForLife(row, column) == false) { //checks for suicide
+        alert("Illegal move.");
+        gameState[row][column] = 2; // corrects the gameState
+        return;
+    }
+
+    if (turn == false) { // updates the UI
         square.style.cssText = "background-image: url(./images/blackstone.png); background-size: cover";
         turn = !turn;
         return;
@@ -117,8 +124,8 @@ function playStone(square) {
 
 /* Generate the first 19x19 board*/
 function firstBoard(squares) {
+    boardSize = squares;
     const board = document.querySelector("#board");
-    const squareWidth = 700 / squares;
 
     for (i = 0; i < squares; ++i) {
         const row = document.createElement("div");
@@ -148,5 +155,6 @@ function newBoard() {
     board.replaceChildren();
     firstBoard(squares);
 }
+
 
 firstBoard(19);
