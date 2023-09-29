@@ -1,14 +1,14 @@
 
-let boardSize = 0;
+let boardSize = 0; // records board size for reference
 let turn = false; // false is black, true is white
 let gameState = {}; // stores value of each board space
-let checked = [];
-let koRecord = "";
+let checked = []; // stores list of currently checked structure
+let koRecord = ""; // records ko coordinate
 
-let blackCaptured = 0;
-let whiteCaptured = 0;
+let blackCaptured = 0; // tallys capture points for white
+let whiteCaptured = 0; // tallys capture points for black
 
-function checkOpponent(row, column) {
+function checkOpponent(row, column) { // check for opponent stone on all sides of placed stone
     if ((row - 1) > 0 && gameState[(row - 1)][column] == !turn) {
         if (checkForLife(row - 1, column) == false) {
             removeStones();
@@ -31,7 +31,7 @@ function checkOpponent(row, column) {
     }
 }
 
-function checkForLife(row, column) {
+function checkForLife(row, column) { // check stones and structures for life
     let stone = gameState[row][column];
     let above = `${row - 1}-${column}`;
     let right = `${row}-${column + 1}`;
@@ -56,7 +56,7 @@ function checkForLife(row, column) {
     }
 }
 
-function checkForLiberties(row, column) {
+function checkForLiberties(row, column) { // checks stones for liberties
     if (
         (row - 1) > 0 && gameState[(row - 1)][column] == 2 ||
         (column + 1) < (boardSize + 1) && gameState[row][(column + 1)] == 2 ||
@@ -66,32 +66,32 @@ function checkForLiberties(row, column) {
     }
 }
 
-function removeStones() {
+function removeStones() { // removes stones listed in "checked" array
     if (turn == false) {
-        whiteCaptured += checked.length;
+        whiteCaptured += checked.length; // tally points for black
     } else {
-        blackCaptured += checked.length;
+        blackCaptured += checked.length; // tally points for white
     }
 
     if (checked.length == 1) {
-        koRecord = checked[0];
+        koRecord = checked[0]; // record to prevent ko
     }
 
-    checked.forEach(coordinate => {
+    checked.forEach(coordinate => { // remove dead structure
         let square = document.getElementById(coordinate);
-        square.style.removeProperty("background-image");
+        square.style.removeProperty("background-image"); // remove from UI
         let coordinates = coordinate.split("-");
-        gameState[coordinates[0]][(coordinates[1])] = 2;
+        gameState[coordinates[0]][(coordinates[1])] = 2; // remove from gameState
     });
-    checked = [];
+    checked = []; // reset list of checked stones
 }
 
-function playStone(square) {
+function playStone(square) { // executes the play of a single stone
     let coordinates = square.id.split("-");
     let row = parseInt(coordinates[0]);
     let column = parseInt(coordinates[1]);
 
-    if (gameState[row][column] != 2) {
+    if (gameState[row][column] != 2) { // prevents playing on top of stones
         return;
     }
 
@@ -123,7 +123,7 @@ function playStone(square) {
 }
 
 /* Generate the first 19x19 board*/
-function firstBoard(squares) {
+function firstBoard(squares) { // generates the first board and starting gameState
     boardSize = squares;
     const board = document.querySelector("#board");
 
@@ -148,8 +148,7 @@ function firstBoard(squares) {
     }
 }
 
-/* Generate a new board of 5x5, 13x13, or 19x19 */
-function newBoard() {
+function newBoard() { // generates a new board of 5x5, 13x13, or 19x19
     let squares = prompt("What size board would you like? [5, 13, or 19]");
     const board = document.querySelector("#board");
     board.replaceChildren();
