@@ -1,18 +1,27 @@
 body {
     margin: 0px;
-    background-color: #1b2236;
+    height: 800px;
+    background-color: black;
     font-family: "Arial Narrow", "Times New Roman", Verdana;
     display: flex;
     flex-direction: column;
+    background-repeat: no-repeat;
+    background-image: url(./images/setting1.jpg);
+    background-size: cover;
+}
+
+#container {
+    display: flex;
+    margin: auto;
+    gap: 30px;
+    margin-top: 100px;
+    margin-bottom: 20px;
 }
 
 #board {
-    height: 700px;
-    width: 700px;
-    background-color: white;
+    height: 600px;
+    width: 600px;
     background-size: cover;
-    margin: auto;
-    margin-top: 40px;
     display: flex;
     flex-direction: column;
     padding: 5px;
@@ -29,6 +38,26 @@ body {
     flex-direction: column;
 }
 
-button {
-    margin: 20px auto 0px auto;
+.console {
+    background-color: rgba(255, 255, 255, 0.4);
+    width: 200px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px;
+}
+
+#background-button {
+    margin: auto auto 10px auto;
+    width: 120px;
+    height: 25px;
+    border-radius: 10px;
+    border: none;
+    background-color: black;
+    color: white;
+    opacity: 1;
+}
+
+#background-button:hover {
+    background-color: rgb(58, 58, 58);
 }

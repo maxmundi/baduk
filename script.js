@@ -1,5 +1,6 @@
 
 let boardSize = 0; // records board size for reference
+let backgroundImage = "(./images/setting1.jpg)";
 let turn = false; // false is black, true is white
 let gameState = {}; // stores value of each board space
 let checked = []; // stores list of currently checked structure
@@ -127,6 +128,9 @@ function firstBoard(squares) { // generates the first board and starting gameSta
     boardSize = squares;
     const board = document.querySelector("#board");
 
+    const body = document.querySelector("body"); // set background image
+    body.style.cssText = "background-image: url(./images/setting1.jpg)";
+
     for (i = 0; i < squares; ++i) {
         const row = document.createElement("div");
         row.className += "row";
@@ -155,5 +159,23 @@ function newBoard() { // generates a new board of 5x5, 13x13, or 19x19
     firstBoard(squares);
 }
 
+function changeBackground() { // set new background image
+    const backgroundImages = ["(./images/setting1.jpg)", "(./images/setting2.jpg)", "(./images/setting3.jpg)"]
+
+    let i = backgroundImages.indexOf(backgroundImage);
+    if (i == 2) {
+        i = 0;
+    } else {
+        i++;
+    }
+
+    console.log(i);
+
+    backgroundImage = backgroundImages[i];
+    const body = document.querySelector("body");
+    body.style.cssText = "background-image: url" + backgroundImages[i] + "";
+}
+
 
 firstBoard(19);
+document.querySelector("#background-button").addEventListener("click", () => changeBackground());
